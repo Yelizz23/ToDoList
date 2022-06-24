@@ -1,21 +1,23 @@
 from random import choice
 import telebot
 
-
 token = 'secret_token'
 
 bot = telebot.TeleBot(token)
 
-RANDOM_TASKS = ['Помыть машину', 'Купить цветы', 'Посмотреть сериал', 'Поцеловать жену/мужа', 'Позвонить подруге/другу',
-                'Купить торт и побаловать себя']
-todos = dict()
+
+RANDOM_TASKS = ['Umýt auto', 'Кoupit květiny pro manželku', 'Vzít si volno v práci'
+                'Jít s kamarádkou/kamarádem na pivo', 'Zajít do cukrárny']
+
+todos = {}
+
 
 HELP = '''
-Список доступных команд:
-/help - напечатать справку по программе
-/add - добавить задачу в список 
-/show - напечатать все добавленные задачи
-/random - добавить случайную задачу на дату сегодня
+Seznam dostupných příkazů:
+/add  - zobrazit všechny úkoly na zadaný den
+/todo - přidat úkol
+/random - přidat na dnešní den náhodný úkol
+/help - zobrazení informací
 '''
 
 
@@ -35,16 +37,18 @@ def help(message):
 @bot.message_handler(commands=['random'])
 def random(message):
     task = choice(RANDOM_TASKS)
-    add_todo('сегодня', task)
-    bot.send_message(message.chat.id, f'Задача {task} добавлена на сегодня!')
+    add_todo('dnes', task)
+    bot.send_message(message.chat.id, f'Úkol {task} přidán na dnes')
 
 
 @bot.message_handler(commands=['add'])
 def add(message):
-    _, date, tail = message.text.split(maxsplit=2)
-    task = ' '.join([tail])
+    command = message.text.split(maxsplit=2)
+    date = command([1]).lower()
+    task = command([2])
     add_todo(date, task)
-    bot.send_message(message.chat.id, f'Задача {task} добавлена на дату {date}!')
+    bot.send_message(message.chat.id, f'Úkol {task} přidán na datum {date}!')
+
 
 
 @bot.message_handler(commands=['show'])
@@ -55,7 +59,7 @@ def print_(message):
         for task in todos[date]:
             tasks += f'[ ] {task}\n'
     else:
-        tasks = 'Такой даты нет!'
+        tasks = 'Datum neexistuje!'
     bot.send_message(message.chat.id, tasks)
 
 
